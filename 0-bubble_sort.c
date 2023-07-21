@@ -22,10 +22,9 @@ void bubble_sort(int *array, size_t size)
 				temp = array[j];
 				array[j] = array[j + 1];
 				array[j + 1] = temp;
+				print_array(array, size);
 				swapped = 1;
 			}
-			if (swapped == 1)
-				print_array(array, size);
 		}
 		if (swapped == 0)
 			break;
