@@ -9,7 +9,7 @@
   */
 listint_t *swap(listint_t **list, listint_t *curr)
 {
-	listint_t *prev_node = curr->prev;
+	listint_t *prev_node;
 
 	prev_node = curr->prev;
 	prev_node->next = curr->next;
