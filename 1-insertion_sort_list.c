@@ -18,7 +18,7 @@ listint_t *swap(listint_t **list, listint_t *curr)
 	curr->prev = prev_node->prev;
 	prev_node->prev = curr;
 	curr->next = prev_node;
-	if (prev_node == *list)
+	if (curr->prev == NULL)
 		*list = curr;
 	return (curr);
 }
