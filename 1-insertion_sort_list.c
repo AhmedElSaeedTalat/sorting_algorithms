@@ -4,8 +4,8 @@
   * swap - to make the swap
   *
   * @list: list passed doubly linked list
-  * @prev_node: previous node
   * @curr: current node
+  * Return: current
   */
 listint_t *swap(listint_t **list, listint_t *curr)
 {
@@ -32,7 +32,7 @@ void insertion_sort_list(listint_t **list)
 {
 	listint_t *curr;
 
-	if (list == NULL || *list == NULL)
+	if (list == NULL || *list == NULL || (*list)->next == NULL)
 		return;
 
 	curr = (*list)->next;
