@@ -58,14 +58,7 @@ void counting_sort(int *array, size_t size)
 		index_array[array[i]]++;
 	for (i = 1; i <= k; i++)
 		index_array[i] = index_array[i] + index_array[i - 1];
-	for (i = 0; i < (k + 1); i++)
-	{
-		if (i == 0)
-			printf("%d", index_array[i]);
-		else
-			printf(", %d", index_array[i]);
-	}
-	printf("\n");
+	print_array(index_array, k + 1);
 	sorted_array = malloc(sizeof(int) * size);
 	if (sorted_array == NULL)
 	{
