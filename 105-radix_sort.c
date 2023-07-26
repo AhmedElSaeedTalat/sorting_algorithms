@@ -1,141 +1,144 @@
 #include <stdio.h>
 #include "sort.h"
 #include <stdlib.h>
-char *convert_int(int num, int num_digits)
+/**
+  * get_digit - get digit starting from lsd
+  *
+  * @num: number in an array
+  * @num_iteration: number of iteration of main loop
+  *
+  * Return: the digit needed
+  */
+int get_digit(int num, int num_iteration)
 {
-	char *str;
-	int i, j, elem, var = 1, count = 0;
-	str = malloc(sizeof(char) * (num_digits + 1));
-	elem = num;
-	while(elem > 0)
-	{
-		elem = elem / 10;
-		count++;
-	}
-	j = num_digits;
-	while (j > 1)
-	{
-		var *= 10;
-		j--;
-	}
-	for (i = 0, var = var; i < num_digits; i++, var /= 10)
-	{
-		elem = num;
-		if (count < num_digits && i == 0)
-		{
-			str[i] = '0';
-			continue;
-		}
-		elem = elem / var;
-		elem = elem % 10;
-		str[i] = elem + '0';
-	}
-	str[i] = '\0';
-	return (str);
-}
-void sort_array(char ***temp_arr, int *arr)
-{
-	int n, m, i, num, counter = 0, res = 0;
+	int i, num_count, count = 0, var = 1;
 
-	for (n = 0; n <= 9; n++)
+	/* count digits in the number */
+	num_count = num, count = 0;
+	while (num_count > 0)
+		num_count = num_count / 10, count++;
+	if (num_iteration + 1 > count)
+		return (0);
+	/* calculate var */
+	for (i = 0; i < num_iteration; i++)
 	{
-		if (temp_arr[n] == NULL)
-			continue;
-		for (m = 0; temp_arr[n][m] != NULL; m++)
-		{
-			res = 0;
-			for (i = 0; temp_arr[n][m][i] != '\0'; i++)
-			{
-				num = temp_arr[n][m][i] - '0';
-				res = res * 10 + num;
-			}
-			arr[counter] = res;
-			counter++;
-		}
+		var = var * 10;
 	}
-	print_array(arr, counter);
+		num = num / var;
+		num = num % 10;
+	return (num);
 }
-char **caloc_array(char **arr, char *data, int c)
+/**
+  * _caloc - create memory for a new bucket and copy data
+  * from old bucket
+  *
+  * @arr: old bucket
+  * @value: new value from array to be passed to the bucket
+  * @count: length of old bucket
+  *
+  * Return: new bucket
+  */
+int *_caloc(int *arr, int value, int count)
 {
-	char **new_arr;
-	int i;
+	int i, *new_arr;
 
-	new_arr = malloc(sizeof(char *) * (c + 2));
-	for (i = 0; i < c; i++)
+	new_arr = malloc(sizeof(int) * (count + 2));
+	for (i = 0; i < count; i++)
 		new_arr[i] = arr[i];
-	new_arr[i] = data;
+	new_arr[i] = value;
 	i++;
-	new_arr[i] = NULL;
-
+	new_arr[i] = -1;
+	free(arr);
 	return (new_arr);
 }
-void convert_toString(int *array, size_t size, int num_digits)
+/**
+  * free_buckets - frees the buckets
+  *
+  * @buckets: buckets
+  */
+void free_buckets(int **buckets)
 {
-	size_t i;
-	char ***temp_arr; 
-	char *converted_str;
-	int j, k, index,c = 0;
-	int n, m;
-	
-	char **arr_str = malloc(sizeof(char *) * (size + 1));
-	if (arr_str == NULL)
-		return;
-	for (i = 0; i < size; i++)
+	int b;
+
+	for (b = 0; b < 10; b++)
 	{
-		converted_str = convert_int(array[i], num_digits);
-		arr_str[i] = converted_str;
-	}
-	arr_str[i] = NULL;
-	j = num_digits - 1;
-	temp_arr = malloc(sizeof(char *) * 10);
-	for (n = 0; n < 10; n++)
-		temp_arr[n] = NULL;
-	for (k = 0; k < num_digits; k++)
-	{
-		for (i = 0; i < size; i++)
-		{
-			
-			index = arr_str[i][j] - '0';
-			if (temp_arr[index] == NULL)
-			{
-				temp_arr[index] = malloc(sizeof(char *) * (2));
-				temp_arr[index][0] = arr_str[i];
-				temp_arr[index][1] = NULL;
-			} else
-			{
-				while (temp_arr[index][c])
-					c++;
-				temp_arr[index] = caloc_array(temp_arr[index], arr_str[i], c);
-			}	
-		}
-		sort_array(temp_arr, array);
-		j--;
+		if (buckets[b] == NULL)
+			continue;
+		free(buckets[b]);
+		buckets[b] = NULL;
 	}
 
 }
 /**
-  * main - Entry point
+  * get_numDigit - calculate maximum number of digits
+  * in each integer
   *
-  * Return: Always 0 (Success)
+  * @array: array passed
+  * @size: size passed
+  *
+  * Return: max number of digits
+  */
+int get_numDigit(int *array, size_t size)
+{
+	size_t i;
+	int num, count = 0, num_digits = 1;
+
+	for (i = 0; i < size; i++)
+	{
+		num = array[i], count = 0;
+		while (num > 0)
+			num = num / 10, count++;
+		if (count > num_digits)
+			num_digits = count;
+	}
+	return (num_digits);
+}
+/**
+  * radix_sort - sort using radix algorith
+  *
+  * @array: array passed
+  * @size: size passed
   */
 void radix_sort(int *array, size_t size)
 {
 	size_t i;
-	int elem, count = 0, num_digits = 1;
+	int **buckets, index, k, b, x, num_digits = 1, count_bucket = 0, counter = 0;
 
-	for (i = 0; i < size; i++)
+	if (array == NULL || !size || size < 2)
+		return;
+	num_digits = get_numDigit(array, size), buckets = malloc(sizeof(int *) * 10);
+	if (buckets == NULL)
+		return;
+	for (i = 0; i < 10; i++)
+		buckets[i] = NULL;
+	for (k = 0; k < num_digits; k++)
 	{
-		elem = array[i];
-		count = 0;
-		while(elem > 0)
+		for (i = 0; i < size; i++)
 		{
-			elem = elem / 10;
-			count++;
+			index = get_digit(array[i], k);
+			if (buckets[index] == NULL)
+			{
+				buckets[index] = malloc(sizeof(int) * 2);
+				buckets[index][0] = array[i], buckets[index][1] = -1;
+			} else
+			{
+				while (buckets[index][count_bucket] != -1)
+					count_bucket++;
+				buckets[index] = _caloc(buckets[index], array[i],  count_bucket);
+			}
 		}
-
-		if (num_digits < count)
-			num_digits = count;
+		counter = 0;
+		for (b = 0; b < 10; b++)
+		{
+			if (buckets[b] == NULL)
+				continue;
+			for (x = 0; buckets[b][x] != -1; x++)
+			{
+				array[counter] = buckets[b][x], counter++;
+			}
+		}
+		print_array(array, size);
+		free_buckets(buckets);
 	}
-
-	convert_toString(array, size, num_digits);
+	free(buckets);
 }
