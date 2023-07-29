@@ -43,8 +43,10 @@ int *_caloc(int *arr, int value, int count)
 	int i, *new_arr;
 
 	new_arr = malloc(sizeof(int) * (count + 2));
-	for (i = 0; i < count; i++)
+	for (i = 0; arr[i] != -1; i++)
+	{
 		new_arr[i] = arr[i];
+	}
 	new_arr[i] = value;
 	i++;
 	new_arr[i] = -1;
@@ -125,6 +127,7 @@ void radix_sort(int *array, size_t size)
 				while (buckets[index][count_bucket] != -1)
 					count_bucket++;
 				buckets[index] = _caloc(buckets[index], array[i],  count_bucket);
+				count_bucket = 0;
 			}
 		}
 		counter = 0;
@@ -133,9 +136,7 @@ void radix_sort(int *array, size_t size)
 			if (buckets[b] == NULL)
 				continue;
 			for (x = 0; buckets[b][x] != -1; x++)
-			{
 				array[counter] = buckets[b][x], counter++;
-			}
 		}
 		print_array(array, size);
 		free_buckets(buckets);
